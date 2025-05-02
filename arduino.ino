@@ -1,17 +1,26 @@
 #include <Servo.h>
 
-Servo myServo;
+#define SERVO_PORT 3
 
-void setup() {
-    myServo.attach(5);
-    Serial.begin(9600);
+Servo myServo;
+int val = 0;
+
+void setup(){
+  Serial.begin(9600);
+  myServo.attach(SERVO_PORT);
+  myServo.write(val);
 }
 
-void loop() {
-    if (Serial.available() > 0) {
-        String command = Serial.readStringUntil('\n');
-        int angle = command.toInt();
-        if (angle >= 0 && angle <= 180)
-            myServo.write(angle);
-    }
+void loop(){
+  if (Serial.available() > 0) {
+    String input = Serial.readStringUntil('\n');
+    input.trim();
+    val = input.toInt();
+    if (val >= 0 && val <= 180) {
+      myServo.write(val);
+      Serial.print("Ok! Angle = ");
+      Serial.println(input);
+	} else
+      Serial.println("Not correct input value!");
+  }
 }

@@ -1,10 +1,14 @@
-import serial,time
+import time
+
+
+import serial
 from ollama import chat
 from ollama import ChatResponse
 
+
 def f(text):
     response: ChatResponse = chat(model='llama3.2',         messages=[
-            {"role": "system", "content": "You must give a short answer (one integer between 0 and 180) - the angle of rotation of the Arduino servo."},
+            {"role": "system", "content": "to turn the servo you have to give me only a number from 0 to 180 and there should be no other characters"},
             {"role": "user", "content": text},
         ])
 
@@ -16,16 +20,23 @@ def f(text):
         a=-1
     return a
 
-ser = serial.Serial(port='COM4', baudrate=9600) # відкрити порт COM
+ser = serial.Serial(port='COM3', baudrate=9600) # відкрити порт COM
 time.sleep(2)
 print(ser.portstr) # перевірити чи порт використовується
 
+
 while True:
     text = input("Enter a command (e.g., 'Move servo to 90 degrees'): ")
+    
+    if text == 'exit' or text == 'Exit':
+        ser.close()
+        exit(0)
+    
     a=f(text)
     if a!=-1:
         print(a)
         ser.write(str(a).encode()+b"\n")
         time.sleep(1)
 
+    
 ser.close() # закрити порт
